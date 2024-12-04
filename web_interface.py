@@ -4,6 +4,7 @@ import aiosqlite
 import asyncio
 import os
 
+# Инициализация Flask-приложения и авторизации
 app = Flask(__name__)
 auth = HTTPBasicAuth()
 
@@ -16,17 +17,31 @@ PASSWORD = os.getenv("BOT_ADMIN_PASSWORD", "password")
 def verify_password(username, password):
     return username == USERNAME and password == PASSWORD
 
+# Путь к базе данных
 DB_PATH = "bot_data.db"
+
+# Асинхронная функция для получения последних 50 сообщений
+async def get_last_messages(limit=50):
+    async with aiosqlite.connect(DB_PATH) as db:
+        cursor = await db.execute("SELECT user_id, username, message FROM messages ORDER BY id DESC LIMIT ?", (limit,))
+        messages = await cursor.fetchall()
+    return messages
 
 @app.route("/")
 @auth.login_required
 async def index():
+    # Получаем количество сообщений
     async with aiosqlite.connect(DB_PATH) as db:
         cursor = await db.execute("SELECT COUNT(*) FROM messages")
         message_count = (await cursor.fetchone())[0]
         cursor = await db.execute("SELECT random_replies_enabled FROM settings WHERE id = 1")
         random_enabled = (await cursor.fetchone())[0]
-    return render_template("index.html", message_count=message_count, random_enabled=random_enabled)
+
+    # Получаем последние 50 сообщений
+    messages = await get_last_messages(50)
+
+    # Отправляем данные на страницу
+    return render_template("index.html", message_count=message_count, random_enabled=random_enabled, messages=messages)
 
 @app.route("/toggle_random", methods=["POST"])
 @auth.login_required
@@ -38,4 +53,4 @@ async def toggle_random():
     return redirect(url_for("index"))
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)

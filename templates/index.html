@@ -6,14 +6,43 @@
     <title>Bot Dashboard</title>
 </head>
 <body>
-    <h1>Telegram Bot Dashboard</h1>
-    <p>Total messages saved: {{ message_count }}</p>
-    <form method="POST" action="/toggle_random">
-        <label>
-            <input type="checkbox" name="enabled" {% if random_enabled %}checked{% endif %}>
-            Enable random replies
-        </label>
-        <button type="submit">Save</button>
+    <h1>Bot Dashboard</h1>
+
+    <p><strong>Total Messages:</strong> {{ message_count }}</p>
+    <p><strong>Random Replies Enabled:</strong>
+        {% if random_enabled %}
+            Yes
+        {% else %}
+            No
+        {% endif %}
+    </p>
+
+    <!-- Форма для переключения случайных фраз -->
+    <form action="{{ url_for('toggle_random') }}" method="POST">
+        <label for="enabled">Enable Random Replies:</label>
+        <input type="checkbox" name="enabled" {% if random_enabled %}checked{% endif %}>
+        <input type="submit" value="Save">
     </form>
+
+    <hr>
+
+    <h2>Последние 50 сообщений</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Message</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for message in messages %}
+                <tr>
+                    <td>{{ message[1] }}</td>
+                    <td>{{ message[2] }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
 </body>
 </html>
