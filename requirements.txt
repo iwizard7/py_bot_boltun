@@ -1,0 +1,5 @@
+aiogram
+Flask
+Flask-HTTPAuth
+aiosqlite
+python-dotenv

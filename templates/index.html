@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bot Dashboard</title>
+</head>
+<body>
+    <h1>Telegram Bot Dashboard</h1>
+    <p>Total messages saved: {{ message_count }}</p>
+    <form method="POST" action="/toggle_random">
+        <label>
+            <input type="checkbox" name="enabled" {% if random_enabled %}checked{% endif %}>
+            Enable random replies
+        </label>
+        <button type="submit">Save</button>
+    </form>
+</body>
+</html>
