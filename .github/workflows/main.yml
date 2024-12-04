@@ -12,33 +12,27 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up SSH key
-        run: |
-          mkdir -p ~/.ssh/
-          ls ~/.ssh/
-          echo ${{ secrets.VM_HOST }}
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.VM_HOST }} >> ~/.ssh/known_hosts
+      - name: Install sshpass
+        run: sudo apt-get install -y sshpass
 
       - name: Stop services on VM
         run: |
-          ssh ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << EOF
+          sshpass -p ${{ secrets.VM_PASSWORD }} ssh ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << EOF
             source /opt/py_bot_boltun/venv/bin/activate
             sudo systemctl stop web.service app.service
           EOF
 
       - name: Pull updates on VM
         run: |
-          ssh ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << EOF
+          sshpass -p ${{ secrets.VM_PASSWORD }} ssh ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << EOF
             cd /opt/py_bot_boltun
             source venv/bin/activate
-            git pull origin main
+            git pull origin master
           EOF
 
       - name: Start services on VM
         run: |
-          ssh ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << EOF
+          sshpass -p ${{ secrets.VM_PASSWORD }} ssh ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << EOF
             source /opt/py_bot_boltun/venv/bin/activate
             sudo systemctl start web.service app.service
           EOF
