@@ -1,5 +1,6 @@
 aiogram
 Flask
 Flask-HTTPAuth
+flask[async]
 aiosqlite
 python-dotenv

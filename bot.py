@@ -68,7 +68,6 @@ async def log_message(message: Message):
 # Основная функция
 async def main():
     await init_db()
-    dp.include_router(dp.router)
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
 
